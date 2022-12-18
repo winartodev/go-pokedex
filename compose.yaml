@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: go_pokedex_mysql
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=pokedex
+      - MYSQL_ROOT_PASSWORD=123
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: go_pokedex_app
+    container_name: go_pokedex_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - app:/usr/src/app/
+    environment:
+      - DB_HOST=mysql
+
+volumes:
+  app:
+  db:                  
