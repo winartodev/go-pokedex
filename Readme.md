@@ -143,15 +143,14 @@ DB_DATABASE=pokedex
 DB_USERNAME=root
 DB_PASSWORD=123
 
-# run the application
+# run the application (via docker compose)
 make up
 
 # below command is executed in another terminal
-# health check
-curl -X 'GET' 'http://127.0.0.1:8080/healthz'
+curl --location --request GET 'http://localhost:8080/pokedex/pokemons'
 
 # stop application
-make down
+make stop
 
 # destroy application
 make destroy
