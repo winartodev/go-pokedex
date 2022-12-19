@@ -1,0 +1,739 @@
+openapi: '3.0.2'
+info:
+  title: Pokedex API
+  version: '1.0'
+servers:
+  - url: http://127.0.0.1:8080
+    description: Dev
+  - url: http://api.staging.go-pokedex.com
+    description: Staging
+  - url: http://api.go-pokedex.com
+    description: Prod
+paths:
+  /login:
+    post:
+      tags:
+        - "Default"
+      requestBody:
+        required: true    
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: 
+                  type: string
+                  example: "username"
+                password: 
+                  type: string
+                  example: "123"
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessLoginUser'
+  /register:
+    post:
+      tags:
+        - "Default"
+      requestBody:
+        required: true    
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: 
+                  type: string
+                  example: "username"
+                email: 
+                  type: string
+                  example: "user@mail.com"
+                password: 
+                  type: string
+                  example: "123"
+                role: 
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessRegisterUser'
+  /logout:
+    post:
+      tags:
+        - "Default"
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessLoggedOut'
+  /healthz:
+    get:
+      tags:
+        - "Default"
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ok
+  /pokedex/pokemons:
+    get:
+      tags:
+        - "Public"
+      parameters:
+        - $ref: '#/components/parameters/Name'
+        - $ref: '#/components/parameters/Options'
+        - $ref: '#/components/parameters/Type'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/OrderBy'
+        - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGetPokemons'
+  /pokedex/pokemons/{id}:
+    get:
+      tags:
+        - "Public"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGetPokemon'
+  /pokedex/types:
+    get:
+      tags:
+        - "Public"
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGetTypes'
+  /internal/pokedex/pokemons:
+    get:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/Name'
+        - $ref: '#/components/parameters/Options'
+        - $ref: '#/components/parameters/Type'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/OrderBy'
+        - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGetPokemons'
+    post:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/Cookie'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object  
+              $ref: '#/components/schemas/PokemonRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCreatePokemon'
+                  
+  /internal/pokedex/pokemons/{id}:
+    get:
+      tags:
+        - "Internal"
+      parameters:
+          - $ref: '#/components/parameters/ID'
+          - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGetPokemon'
+    put:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Cookie'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/PokemonRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessUpdatePokemon'
+    delete:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDeletePokemon'
+  /internal/pokedex/types:
+    get:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGetTypes'
+    post:
+      tags: 
+        - "Internal"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: 
+                  type: string
+                  example: FIRE
+      responses:
+        '200': 
+          $ref: '#/components/responses/SuccessCreatType'
+          
+  /internal/pokedex/types/{id}:
+    get:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200': 
+          $ref: '#/components/responses/SuccessGetType'
+    put:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Cookie'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: 
+                  type: string
+                  example: FIRE
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessUpdateType'
+    delete:
+      tags:
+        - "Internal"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDeleteType'
+
+  /user/pokedex/pokemons/{id}/catch:
+    post:
+      tags:
+        - "User"
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/Cookie'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCatchPokemon'
+                
+
+components:
+  parameters:
+    ID:
+      name: id
+      in: path
+      schema:
+        type: integer
+        example: 1
+      required: true
+
+    Name:
+      name: name
+      in: query
+      schema:
+        type: string
+
+    Options:
+      name: options
+      in: query
+      schema:
+        type: string
+        enum:
+          - 1
+          - 0
+
+    Type:
+      name: type
+      in: query
+      schema:
+        type: string
+
+    SortBy:
+      name: sort_by
+      in: query
+      schema:
+        type: string
+        enum:
+          - id
+          - name
+
+    OrderBy:
+      name: order_by
+      in: query
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+
+    Cookie:
+      name: Cookie
+      in: header
+      schema:
+        type: string
+
+  schemas:
+    Type: 
+      properties:
+        id: 
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "GRASS"
+
+    Types: 
+      type: array
+      items:
+        oneOf: 
+          - properties:
+              id: 
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: "GRASS"
+          - properties:
+              id: 
+                type: integer
+                example: 2
+              name:
+                type: string
+                example: "PSYCHIC"
+          - properties:
+              id: 
+                type: integer
+                example: 3
+              name:
+                type: string
+                example: "FIRE"
+      
+    Pokemonlist: 
+      type: array
+      items:
+        oneOf:
+          - properties:
+              id: 
+                type: integer
+                example: 1
+              name:
+                type: string
+                description: pokemon name.
+                example: "Bulbasour"
+              species:
+                  type: string
+                  description: pokemon species.
+                  example: "Fyling Pokemon"
+              types:
+                  type: array
+                  items:
+                    type: string
+                  description: pokemon types.
+                  example: ["GRASS", "FIRE"]
+              catched:
+                  type: integer
+                  description: status pokemon has catched or not
+                  example: 0
+              image_url:
+                  type: string
+                  description: pokemon URL image.
+                  example: https://pokedex.photos/200/300
+          - properties:
+              id: 
+                type: integer
+                example: 2
+              name:
+                type: string
+                description: pokemon name.
+                example: "Pikachu"
+              species:
+                  type: string
+                  description: pokemon species.
+                  example: "Lighting Pokemon"
+              types:
+                  type: array
+                  items:
+                    type: string
+                  description: pokemon types.
+                  example: ["FIRE"]
+              catched:
+                  type: integer
+                  description: status pokemon has catched or not
+                  example: 0
+              image_url:
+                  type: string
+                  description: pokemon URL image.
+                  example: https://pokedex.photos/200/300
+
+    PokemonDetail:
+      properties: 
+        id: 
+          type: integer
+          example: 0
+        name:
+          type: string
+          description: pokemon name.
+          example: "Bulbasour"
+        species:
+            type: string
+            description: pokemon species.
+            example: "Fyling Pokemon"
+        types:
+            type: array
+            items:
+              type: string
+            description: pokemon types.
+            example: ["GRASS", "FIRE"]
+        catched:
+            type: integer
+            description: status pokemon has catched or not
+            example: 0
+        image_url:
+            type: string
+            description: pokemon URL image.
+            example: https://pokedex.photos/200/300
+        description: 
+          type: string 
+          description: description of pokemon
+          example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        weight:
+          type: integer
+          description: weight of pokemon
+          example: 2.5
+        height:
+          type: integer
+          description: height of pokemon
+          example: 5.1
+        stats:
+          type: object
+          properties:
+            hp:
+              type: integer
+              example: 100
+            attack:
+              type: integer
+              example: 100
+            def:
+              type: integer
+              example: 100
+            speed:
+              type: integer
+              example: 100 
+    
+    PokemonRequest:
+      properties: 
+        name:
+          type: string
+          description: pokemon name.
+          example: "Bulbasour"
+        species:
+            type: string
+            description: pokemon species.
+            example: "Fyling Pokemon"
+        types:
+            type: array
+            items:
+              type: integer
+            description: pokemon types.
+            example: [1, 2]
+        catched:
+            type: integer
+            description: status pokemon has catched or not
+            example: 0
+        image_url:
+            type: string
+            description: pokemon URL image.
+            example: https://pokedex.photos/200/300
+        description: 
+          type: string 
+          description: description of pokemon
+          example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        weight:
+          type: integer
+          description: weight of pokemon
+          example: 2.5
+        height:
+          type: integer
+          description: height of pokemon
+          example: 5.1
+        stats:
+          type: object
+          properties:
+            hp:
+              type: integer
+              example: 100
+            attack:
+              type: integer
+              example: 100
+            def:
+              type: integer
+              example: 100
+            speed:
+              type: integer
+              example: 100 
+
+  responses:
+    SuccessLoginUser:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "login success"
+              data: 
+                type: object
+                example: null
+
+    SuccessRegisterUser:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "success create account"
+              data: 
+                type: object
+                example: 1
+
+    SuccessCreatType:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "success create type"
+              data: 
+                type: object
+                example: 1
+
+    SuccessUpdateType:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "update type success"
+              data: 
+                type: object
+                example: null
+
+    SuccessDeleteType:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "delete type success"
+              data: 
+                type: object
+                example: null
+
+    SuccessLoggedOut:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "user logout success"
+              data: 
+                type: object
+                example: null
+
+    SuccessGetTypes:
+      description: OK
+      content:
+        application/json:
+          schema: 
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: ""
+              data: 
+                type: object
+                $ref: '#/components/schemas/Types'
+
+    SuccessGetPokemons:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: ""
+              data: 
+                type: array
+                $ref: '#/components/schemas/Pokemonlist'
+
+    SuccessCreatePokemon:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "success create pokemon"
+              data: 
+                type: object
+                example: 1
+
+    SuccessGetPokemon:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: ""
+              data: 
+                type: object
+                $ref: '#/components/schemas/PokemonDetail'
+
+    SuccessGetType:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: ""
+              data: 
+                type: object
+                $ref: '#/components/schemas/Type'
+
+    SuccessUpdatePokemon:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "success update pokemon"
+              data: 
+                type: object
+                $ref: '#/components/schemas/PokemonDetail'
+
+    SuccessDeletePokemon:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:  
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "delete pokemon success"
+              data: 
+                type: object
+                example: 1
+
+    SuccessCatchPokemon:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:  
+              status: 
+                type: integer
+                example: 200
+              message: 
+                type: string
+                example: "Pokemon success catched"
+              data: 
+                type: object
+                example: 1
+                
