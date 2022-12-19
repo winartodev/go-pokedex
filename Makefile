@@ -23,6 +23,9 @@ up:
 down:
 	docker compose down
 
+stop:
+	docker compose stop
+
 destroy:
 	@ docker-compose down --remove-orphans -v
 	@ printf "Cleanning artifacts... "

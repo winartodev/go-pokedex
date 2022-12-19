@@ -153,7 +153,7 @@ None
 + `username` *(Required)* user username
 + `email` *(Required)* user email
 + `password` *(Required)* user password
-+ `role` *(Required)* user role to mapping as an admin or user
++ `role` *(Required)* user role to mapping as an admin value `1` or user value `2`
 
 #### Example Request 
 ```sh

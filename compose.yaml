@@ -4,7 +4,7 @@ services:
     image: mysql:8.0
     container_name: go_pokedex_mysql
     volumes:
-      - db:/var/lib/mysql
+      - ./pokedex.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
     environment:

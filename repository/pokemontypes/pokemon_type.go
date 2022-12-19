@@ -25,15 +25,6 @@ func NewPokemonTypeRepository(db *sql.DB) PokemonTypeRepositoryItf {
 	}
 }
 
-func CreateTablePokemonTypes(db *sql.DB) (err error) {
-	_, err = db.Exec(CreateTablePokemonTypesQuery)
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
 func (pt *PokemonTypeRepository) CreatePokemonTypeDB(ctx context.Context, data entity.PokemonType) (err error) {
 	_, err = pt.PokemonTypeDB.ExecContext(ctx, InsertPokemonTypeQuery, &data.PokemonID, &data.TypeID)
 	if err != nil {

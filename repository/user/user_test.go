@@ -52,50 +52,6 @@ func TestNewUserRepository(t *testing.T) {
 	}
 }
 
-func TestCreateTableUsers(t *testing.T) {
-	db, dbmock := NewMock()
-	query := CreateTableUsersQuery
-	type args struct {
-		db *sql.DB
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-		mock    func()
-	}{
-		{
-			name: "success",
-			args: args{
-				db,
-			},
-			wantErr: false,
-			mock: func() {
-				dbmock.ExpectExec(regexp.QuoteMeta(query)).WillReturnResult(sqlmock.NewResult(0, 0))
-			},
-		},
-		{
-			name: "failed",
-			args: args{
-				db,
-			},
-			wantErr: true,
-			mock: func() {
-				dbmock.ExpectExec(regexp.QuoteMeta(query)).WillReturnError(errors.New("error"))
-			},
-		},
-	}
-	for _, tt := range tests {
-		tt.mock()
-		defer tt.mock()
-		t.Run(tt.name, func(t *testing.T) {
-			if err := CreateTableUsers(tt.args.db); (err != nil) != tt.wantErr {
-				t.Errorf("CreateTableUsers() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestUserRepository_CreateUser(t *testing.T) {
 	db, dbmock := NewMock()
 	ctx := context.Background()

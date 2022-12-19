@@ -52,50 +52,6 @@ func TestNewTypeRepository(t *testing.T) {
 	}
 }
 
-func TestCreateTableTypes(t *testing.T) {
-	db, dbmock := NewMock()
-	query := CreateTableTypesQuery
-	type args struct {
-		db *sql.DB
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-		mock    func()
-	}{
-		{
-			name: "success",
-			args: args{
-				db: db,
-			},
-			wantErr: false,
-			mock: func() {
-				dbmock.ExpectExec(regexp.QuoteMeta(query)).WillReturnResult(sqlmock.NewResult(0, 0))
-			},
-		},
-		{
-			name: "failed",
-			args: args{
-				db: db,
-			},
-			wantErr: true,
-			mock: func() {
-				dbmock.ExpectExec(regexp.QuoteMeta(query)).WillReturnError(errors.New("error"))
-			},
-		},
-	}
-	for _, tt := range tests {
-		tt.mock()
-		defer tt.mock()
-		t.Run(tt.name, func(t *testing.T) {
-			if err := CreateTableTypes(tt.args.db); (err != nil) != tt.wantErr {
-				t.Errorf("CreateTableTypes() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestTypeRepository_CreateTypeDB(t *testing.T) {
 	db, dbmock := NewMock()
 	ctx := context.Background()
