@@ -1,17 +1,6 @@
 package pokemonrepository
 
 const (
-	CreateTablePokemonQuery = `
-		CREATE TABLE IF NOT EXISTS pokemons (
-			id int not null auto_increment,
-			name varchar(255) not null,
-			species varchar(255) not null,
-			catched int not null,
-			metadata text,
-			primary key (id)
-		);
-	`
-
 	GetPokemonQuery = `
 		SELECT 
 			pokemons.id, 

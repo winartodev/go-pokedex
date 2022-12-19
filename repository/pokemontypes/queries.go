@@ -1,15 +1,6 @@
 package pokemontyperepository
 
 const (
-	CreateTablePokemonTypesQuery = `
-		CREATE TABLE IF NOT EXISTS pokemon_types (
-			id int not null auto_increment,
-			pokemon_id int not null,
-			types_id int not null,
-			primary key (id)
-		);
-	`
-
 	InsertPokemonTypeQuery = `
 		INSERT INTO pokedex.pokemon_types
 		(

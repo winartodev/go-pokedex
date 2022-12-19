@@ -51,50 +51,6 @@ func TestNewPokemonTypeRepository(t *testing.T) {
 	}
 }
 
-func TestCreateTablePokemonTypes(t *testing.T) {
-	db, dbmock := NewMock()
-	query := CreateTablePokemonTypesQuery
-	type args struct {
-		db *sql.DB
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-		mock    func()
-	}{
-		{
-			name: "success",
-			args: args{
-				db: db,
-			},
-			wantErr: false,
-			mock: func() {
-				dbmock.ExpectExec(regexp.QuoteMeta(query)).WillReturnResult(sqlmock.NewResult(0, 0))
-			},
-		},
-		{
-			name: "failed",
-			args: args{
-				db: db,
-			},
-			wantErr: true,
-			mock: func() {
-				dbmock.ExpectExec(regexp.QuoteMeta(query)).WillReturnError(errors.New("error"))
-			},
-		},
-	}
-	for _, tt := range tests {
-		tt.mock()
-		defer tt.mock()
-		t.Run(tt.name, func(t *testing.T) {
-			if err := CreateTablePokemonTypes(tt.args.db); (err != nil) != tt.wantErr {
-				t.Errorf("CreateTablePokemonTypes() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestPokemonTypeRepository_CreatePokemonTypeDB(t *testing.T) {
 	db, dbmock := NewMock()
 	ctx := context.Background()

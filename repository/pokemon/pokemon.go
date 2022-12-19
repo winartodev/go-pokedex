@@ -27,15 +27,6 @@ func NewPokemonRepository(db *sql.DB) PokemonRepositoryItf {
 	}
 }
 
-func CreateTablePokemons(db *sql.DB) (err error) {
-	_, err = db.Exec(CreateTablePokemonQuery)
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
 func (pr *PokemonRepository) GetAllPokemonDB(ctx context.Context) (results []entity.PokemonDB, err error) {
 	rows, err := pr.PokemonDB.QueryContext(ctx, fmt.Sprintf("%s %s", GetPokemonQuery, `GROUP BY pokemons.id`))
 	if err != nil {

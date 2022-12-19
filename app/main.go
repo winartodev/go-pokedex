@@ -27,10 +27,10 @@ func main() {
 	}
 
 	// generate database
-	err = config.MakeMigrate(db)
-	if err != nil {
-		panic(err)
-	}
+	// err = config.MakeMigrate(db)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	defer db.Close()
 

@@ -25,15 +25,6 @@ func NewTypeRepository(db *sql.DB) TypeRepositoryItf {
 	}
 }
 
-func CreateTableTypes(db *sql.DB) (err error) {
-	_, err = db.Exec(CreateTableTypesQuery)
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
 func (tr *TypeRepository) CreateTypeDB(ctx context.Context, data entity.Type) (id int64, err error) {
 	row, err := tr.TypeDB.ExecContext(ctx, InsertTypeQuery, &data.Name)
 	if err != nil {

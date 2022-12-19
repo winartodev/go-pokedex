@@ -21,15 +21,6 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{DB: db}
 }
 
-func CreateTableUsers(db *sql.DB) (err error) {
-	_, err = db.Exec(CreateTableUsersQuery)
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
 func (ur *UserRepository) CreateUser(ctx context.Context, username string, email string, password string, role int64) (id int64, err error) {
 	row, err := ur.DB.ExecContext(ctx, InsertUserQuery, username, email, password, role)
 	if err != nil {
