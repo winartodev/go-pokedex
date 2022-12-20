@@ -26,12 +26,6 @@ func main() {
 		panic(err)
 	}
 
-	// generate database
-	// err = config.MakeMigrate(db)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
 	defer db.Close()
 
 	// initialize repository
