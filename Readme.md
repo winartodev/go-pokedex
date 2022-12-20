@@ -6,6 +6,8 @@
 - [Database](#database)
 - [Requirements](#requirements)
 - [How To Run This Project](#how-to-run-this-project)
+- [Unit Testing](#unit-testing)
+- [How To Run Test](#how-to-run-test)
 
 ## Description
 Go Pokedex is API wants to 
@@ -155,6 +157,20 @@ make stop
 # destroy application
 make destroy
 ```
+
+## Unit Testing
+Unit tests are the process of testing software functions independently of other functions.
+for this project we use table driven testing, and if we want to make a unit test we have to make a mocking especially we want to make a test which has other functions in it
+
+first we want to create the mock with mockery here for the command 
+```
+mockery --dir=repository/pokemon --name=PokemonRepositoryItf --filename=pokemon_mock.go --output=repository/pokemon/mocks --outpkg=pokemonrepositorymock
+```
+
+after creating the mock, you can follow the unit test that was created earlier
+for example you can follow [pokemon_test.go](/usecase/pokemon_test.go)
+
+after you've done create unit test you can run the unit test by following this command below
 
 ## How To Run Test 
 ```sh

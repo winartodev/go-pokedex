@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -205,11 +206,11 @@ func (s *Server) Register(w http.ResponseWriter, r *http.Request, _ httprouter.P
 
 	// validate username & password
 	if request.Username == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("username can't be empty"))
 		return
 	}
 	if request.Password == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("password can't be empty"))
 		return
 	}
 
@@ -233,11 +234,11 @@ func (s *Server) Login(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	// validate username & password
 	if request.Username == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("username can't be empty"))
 		return
 	}
 	if request.Password == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("password can't be empty"))
 		return
 	}
 
