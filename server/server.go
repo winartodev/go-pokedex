@@ -19,7 +19,7 @@ type Server struct {
 	Router         *httprouter.Router
 	PokemonUsecase usecase.PokemonUsecaseItf
 	TypeUsecase    usecase.TypeUsecaseItf
-	UserUsecase    usecase.UserUsecase
+	UserUsecase    usecase.UserUsecaseItf
 }
 
 func (s *Server) GetAllPokemon(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
