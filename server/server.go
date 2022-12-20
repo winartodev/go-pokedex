@@ -11,10 +11,6 @@ import (
 	"github.com/winartodev/go-pokedex/usecase"
 )
 
-const (
-	CATCH = 1
-)
-
 type Server struct {
 	Router         *httprouter.Router
 	PokemonUsecase usecase.PokemonUsecaseItf
