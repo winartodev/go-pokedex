@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -11,15 +12,11 @@ import (
 	"github.com/winartodev/go-pokedex/usecase"
 )
 
-const (
-	CATCH = 1
-)
-
 type Server struct {
 	Router         *httprouter.Router
 	PokemonUsecase usecase.PokemonUsecaseItf
 	TypeUsecase    usecase.TypeUsecaseItf
-	UserUsecase    usecase.UserUsecase
+	UserUsecase    usecase.UserUsecaseItf
 }
 
 func (s *Server) GetAllPokemon(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -62,9 +59,13 @@ func (s *Server) GetPokemonByID(w http.ResponseWriter, r *http.Request, param ht
 }
 
 func (s *Server) CatchPokemon(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
-	err := s.PokemonUsecase.CatchPokemon(r.Context(), id)
+	err = s.PokemonUsecase.CatchPokemon(r.Context(), id)
 	if err != nil {
 		helper.FailedResponse(w, http.StatusBadRequest, err)
 		return
@@ -91,7 +92,11 @@ func (s *Server) CreatePokemon(w http.ResponseWriter, r *http.Request, param htt
 }
 
 func (s *Server) UpdatePokemon(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
 	var pokemon entity.Pokemon
 	decoder := json.NewDecoder(r.Body)
@@ -110,9 +115,13 @@ func (s *Server) UpdatePokemon(w http.ResponseWriter, r *http.Request, param htt
 }
 
 func (s *Server) DeletePokemon(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
-	err := s.PokemonUsecase.DeletePokemon(r.Context(), id)
+	err = s.PokemonUsecase.DeletePokemon(r.Context(), id)
 	if err != nil {
 		helper.FailedResponse(w, http.StatusBadRequest, err)
 		return
@@ -149,7 +158,11 @@ func (s *Server) CreateType(w http.ResponseWriter, r *http.Request, _ httprouter
 }
 
 func (s *Server) GetTypeByID(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
 	res, err := s.TypeUsecase.GeTypeByID(r.Context(), id)
 	if err != nil {
@@ -161,7 +174,11 @@ func (s *Server) GetTypeByID(w http.ResponseWriter, r *http.Request, param httpr
 }
 
 func (s *Server) UpdateType(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
 	var types entity.Type
 	decoder := json.NewDecoder(r.Body)
@@ -170,7 +187,7 @@ func (s *Server) UpdateType(w http.ResponseWriter, r *http.Request, param httpro
 		return
 	}
 
-	err := s.TypeUsecase.UpdateType(r.Context(), id, types)
+	err = s.TypeUsecase.UpdateType(r.Context(), id, types)
 	if err != nil {
 		helper.FailedResponse(w, http.StatusBadRequest, err)
 		return
@@ -189,11 +206,11 @@ func (s *Server) Register(w http.ResponseWriter, r *http.Request, _ httprouter.P
 
 	// validate username & password
 	if request.Username == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("username can't be empty"))
 		return
 	}
 	if request.Password == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("password can't be empty"))
 		return
 	}
 
@@ -217,11 +234,11 @@ func (s *Server) Login(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 
 	// validate username & password
 	if request.Username == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("username can't be empty"))
 		return
 	}
 	if request.Password == "" {
-		helper.FailedResponse(w, http.StatusBadRequest, err)
+		helper.FailedResponse(w, http.StatusBadRequest, errors.New("password can't be empty"))
 		return
 	}
 

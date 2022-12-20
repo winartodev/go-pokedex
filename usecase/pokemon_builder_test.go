@@ -8,7 +8,9 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/winartodev/go-pokedex/entity"
+	pokemonrepository "github.com/winartodev/go-pokedex/repository/pokemon"
 	pokemonrepositorymock "github.com/winartodev/go-pokedex/repository/pokemon/mocks"
+	pokemontyperepository "github.com/winartodev/go-pokedex/repository/pokemontypes"
 	pokemontyperepositorymock "github.com/winartodev/go-pokedex/repository/pokemontypes/mocks"
 )
 
@@ -24,17 +26,9 @@ func buildPokemonProvider() mockBuildPokemonProvider {
 	}
 }
 
-func newBuildPokemonProviderMock(repo PokemonUsecase) PokemonUsecase {
-	return PokemonUsecase{
-		PokemonRepository:     repo.PokemonRepository,
-		PokemonTypeRepository: repo.PokemonTypeRepository,
-	}
-}
-
 func TestPokemonUsecase_buildResponsePokemonList(t *testing.T) {
 	ctx := context.Background()
 	prov := buildPokemonProvider()
-
 	pokemons := []entity.PokemonList{
 		{
 			ID:       1,
@@ -45,12 +39,18 @@ func TestPokemonUsecase_buildResponsePokemonList(t *testing.T) {
 			ImageURL: "",
 		},
 	}
+
+	type fields struct {
+		PokemonRepository     pokemonrepository.PokemonRepositoryItf
+		PokemonTypeRepository pokemontyperepository.PokemonTypeRepositoryItf
+	}
 	type args struct {
 		ctx      context.Context
 		pokemons []entity.PokemonDB
 	}
 	tests := []struct {
 		name       string
+		fields     fields
 		args       args
 		wantResult []entity.PokemonList
 		wantErr    bool
@@ -58,6 +58,10 @@ func TestPokemonUsecase_buildResponsePokemonList(t *testing.T) {
 	}{
 		{
 			name: "fail GetPokemonTypeByPokemonIDDB",
+			fields: fields{
+				PokemonRepository:     prov.PokemonRepository,
+				PokemonTypeRepository: prov.PokemonTypeRepository,
+			},
 			args: args{
 				ctx:      ctx,
 				pokemons: []entity.PokemonDB{{ID: 1, Name: "Bulbasour", Species: "Seed Pokémon", Catched: 1, Metadata: `{}`}},
@@ -65,11 +69,16 @@ func TestPokemonUsecase_buildResponsePokemonList(t *testing.T) {
 			wantResult: nil,
 			wantErr:    true,
 			mock: func() {
-				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, errors.New("error")).Times(1)
+				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).
+					Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, errors.New("error")).Times(1)
 			},
 		},
 		{
 			name: "marhsall error",
+			fields: fields{
+				PokemonRepository:     prov.PokemonRepository,
+				PokemonTypeRepository: prov.PokemonTypeRepository,
+			},
 			args: args{
 				ctx:      ctx,
 				pokemons: []entity.PokemonDB{{ID: 1, Name: "Bulbasour", Species: "Seed Pokémon", Catched: 1, Metadata: ""}},
@@ -77,11 +86,16 @@ func TestPokemonUsecase_buildResponsePokemonList(t *testing.T) {
 			wantResult: nil,
 			wantErr:    true,
 			mock: func() {
-				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, nil).Times(1)
+				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).
+					Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, nil).Times(1)
 			},
 		},
 		{
 			name: "success",
+			fields: fields{
+				PokemonRepository:     prov.PokemonRepository,
+				PokemonTypeRepository: prov.PokemonTypeRepository,
+			},
 			args: args{
 				ctx:      ctx,
 				pokemons: []entity.PokemonDB{{ID: 1, Name: "Bulbasour", Species: "Seed Pokémon", Catched: 1, Metadata: `{}`}},
@@ -89,7 +103,8 @@ func TestPokemonUsecase_buildResponsePokemonList(t *testing.T) {
 			wantResult: pokemons,
 			wantErr:    false,
 			mock: func() {
-				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, nil).Times(1)
+				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).
+					Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, nil).Times(1)
 			},
 		},
 	}
@@ -97,10 +112,10 @@ func TestPokemonUsecase_buildResponsePokemonList(t *testing.T) {
 		tt.mock()
 		defer tt.mock()
 		t.Run(tt.name, func(t *testing.T) {
-			pu := newBuildPokemonProviderMock(PokemonUsecase{
-				PokemonRepository:     prov.PokemonRepository,
-				PokemonTypeRepository: prov.PokemonTypeRepository,
-			})
+			pu := &PokemonUsecase{
+				PokemonRepository:     tt.fields.PokemonRepository,
+				PokemonTypeRepository: tt.fields.PokemonTypeRepository,
+			}
 
 			gotResult, err := pu.buildResponsePokemonList(tt.args.ctx, tt.args.pokemons)
 			if (err != nil) != tt.wantErr {
@@ -126,6 +141,10 @@ func TestPokemonUsecase_buildResponsePokemonDetail(t *testing.T) {
 		ImageURL: "",
 	}
 
+	type fields struct {
+		PokemonRepository     pokemonrepository.PokemonRepositoryItf
+		PokemonTypeRepository pokemontyperepository.PokemonTypeRepositoryItf
+	}
 	type args struct {
 		ctx  context.Context
 		data entity.PokemonDB
@@ -133,12 +152,17 @@ func TestPokemonUsecase_buildResponsePokemonDetail(t *testing.T) {
 	tests := []struct {
 		name       string
 		args       args
+		fields     fields
 		wantResult *entity.PokemonDetail
 		wantErr    bool
 		mock       func()
 	}{
 		{
 			name: "fail GetPokemonTypeByPokemonIDDB",
+			fields: fields{
+				PokemonRepository:     prov.PokemonRepository,
+				PokemonTypeRepository: prov.PokemonTypeRepository,
+			},
 			args: args{
 				ctx:  ctx,
 				data: entity.PokemonDB{ID: 1, Name: "Bulbasour", Species: "Seed Pokémon", Catched: 1, Metadata: `{}`},
@@ -146,11 +170,16 @@ func TestPokemonUsecase_buildResponsePokemonDetail(t *testing.T) {
 			wantResult: nil,
 			wantErr:    true,
 			mock: func() {
-				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, errors.New("error")).Times(1)
+				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).
+					Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, errors.New("error")).Times(1)
 			},
 		},
 		{
 			name: "marhsall error",
+			fields: fields{
+				PokemonRepository:     prov.PokemonRepository,
+				PokemonTypeRepository: prov.PokemonTypeRepository,
+			},
 			args: args{
 				ctx:  ctx,
 				data: entity.PokemonDB{ID: 1, Name: "Bulbasour", Species: "Seed Pokémon", Catched: 1, Metadata: ""},
@@ -158,12 +187,17 @@ func TestPokemonUsecase_buildResponsePokemonDetail(t *testing.T) {
 			wantResult: nil,
 			wantErr:    true,
 			mock: func() {
-				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, errors.New("error")).Times(1)
+				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).
+					Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, errors.New("error")).Times(1)
 			},
 		},
 
 		{
 			name: "success",
+			fields: fields{
+				PokemonRepository:     prov.PokemonRepository,
+				PokemonTypeRepository: prov.PokemonTypeRepository,
+			},
 			args: args{
 				ctx:  ctx,
 				data: entity.PokemonDB{ID: 1, Name: "Bulbasour", Species: "Seed Pokémon", Catched: 1, Metadata: `{}`},
@@ -171,7 +205,8 @@ func TestPokemonUsecase_buildResponsePokemonDetail(t *testing.T) {
 			wantResult: pokemons,
 			wantErr:    false,
 			mock: func() {
-				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, nil).Times(1)
+				prov.PokemonTypeRepository.Mock.On("GetPokemonTypeByPokemonIDDB", mock.Anything, mock.Anything).
+					Return([]entity.PokemonType{{ID: 1, Name: "Fire"}}, nil).Times(1)
 			},
 		},
 	}
@@ -179,10 +214,10 @@ func TestPokemonUsecase_buildResponsePokemonDetail(t *testing.T) {
 		tt.mock()
 		defer tt.mock()
 		t.Run(tt.name, func(t *testing.T) {
-			pu := newBuildPokemonProviderMock(PokemonUsecase{
-				PokemonRepository:     prov.PokemonRepository,
-				PokemonTypeRepository: prov.PokemonTypeRepository,
-			})
+			pu := &PokemonUsecase{
+				PokemonRepository:     tt.fields.PokemonRepository,
+				PokemonTypeRepository: tt.fields.PokemonTypeRepository,
+			}
 
 			gotResult, err := pu.buildResponsePokemonDetail(tt.args.ctx, tt.args.data)
 			if (err != nil) != tt.wantErr {
@@ -199,11 +234,16 @@ func TestPokemonUsecase_buildResponsePokemonDetail(t *testing.T) {
 func TestPokemonUsecase_buildPokemonFromRequest(t *testing.T) {
 	prov := buildPokemonProvider()
 
+	type fields struct {
+		PokemonRepository     pokemonrepository.PokemonRepositoryItf
+		PokemonTypeRepository pokemontyperepository.PokemonTypeRepositoryItf
+	}
 	type args struct {
 		data entity.Pokemon
 	}
 	tests := []struct {
 		name       string
+		fields     fields
 		args       args
 		wantResult entity.PokemonDB
 		wantErr    bool
@@ -211,6 +251,10 @@ func TestPokemonUsecase_buildPokemonFromRequest(t *testing.T) {
 	}{
 		{
 			name: "success",
+			fields: fields{
+				PokemonRepository:     prov.PokemonRepository,
+				PokemonTypeRepository: prov.PokemonTypeRepository,
+			},
 			args: args{
 				data: entity.Pokemon{
 					ID: 1,
@@ -225,10 +269,10 @@ func TestPokemonUsecase_buildPokemonFromRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pu := newBuildPokemonProviderMock(PokemonUsecase{
-				PokemonRepository:     prov.PokemonRepository,
-				PokemonTypeRepository: prov.PokemonTypeRepository,
-			})
+			pu := &PokemonUsecase{
+				PokemonRepository:     tt.fields.PokemonRepository,
+				PokemonTypeRepository: tt.fields.PokemonTypeRepository,
+			}
 
 			gotResult, err := pu.buildPokemonFromRequest(tt.args.data)
 			if (err != nil) != tt.wantErr {

@@ -21,8 +21,8 @@ type UserUsecaseItf interface {
 	Login(ctx context.Context, username string, password string) (token string, err error)
 }
 
-func NewUserUsecase(userUsecase UserUsecase) UserUsecase {
-	return UserUsecase{
+func NewUserUsecase(userUsecase UserUsecase) UserUsecaseItf {
+	return &UserUsecase{
 		userUsecase.UserRepository,
 	}
 }
