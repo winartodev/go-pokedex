@@ -32,14 +32,14 @@ func TestNewUserUsecase(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want UserUsecase
+		want UserUsecaseItf
 	}{
 		{
 			name: "success",
 			args: args{
 				userUsecase: userUsecase,
 			},
-			want: userUsecase,
+			want: &userUsecase,
 		},
 	}
 	for _, tt := range tests {
