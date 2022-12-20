@@ -58,9 +58,13 @@ func (s *Server) GetPokemonByID(w http.ResponseWriter, r *http.Request, param ht
 }
 
 func (s *Server) CatchPokemon(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
-	err := s.PokemonUsecase.CatchPokemon(r.Context(), id)
+	err = s.PokemonUsecase.CatchPokemon(r.Context(), id)
 	if err != nil {
 		helper.FailedResponse(w, http.StatusBadRequest, err)
 		return
@@ -87,7 +91,11 @@ func (s *Server) CreatePokemon(w http.ResponseWriter, r *http.Request, param htt
 }
 
 func (s *Server) UpdatePokemon(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
 	var pokemon entity.Pokemon
 	decoder := json.NewDecoder(r.Body)
@@ -106,9 +114,13 @@ func (s *Server) UpdatePokemon(w http.ResponseWriter, r *http.Request, param htt
 }
 
 func (s *Server) DeletePokemon(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
-	err := s.PokemonUsecase.DeletePokemon(r.Context(), id)
+	err = s.PokemonUsecase.DeletePokemon(r.Context(), id)
 	if err != nil {
 		helper.FailedResponse(w, http.StatusBadRequest, err)
 		return
@@ -145,7 +157,11 @@ func (s *Server) CreateType(w http.ResponseWriter, r *http.Request, _ httprouter
 }
 
 func (s *Server) GetTypeByID(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
 	res, err := s.TypeUsecase.GeTypeByID(r.Context(), id)
 	if err != nil {
@@ -157,7 +173,11 @@ func (s *Server) GetTypeByID(w http.ResponseWriter, r *http.Request, param httpr
 }
 
 func (s *Server) UpdateType(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, _ := strconv.ParseInt(param.ByName("id"), 10, 64)
+	id, err := strconv.ParseInt(param.ByName("id"), 10, 64)
+	if err != nil {
+		helper.FailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
 
 	var types entity.Type
 	decoder := json.NewDecoder(r.Body)
@@ -166,7 +186,7 @@ func (s *Server) UpdateType(w http.ResponseWriter, r *http.Request, param httpro
 		return
 	}
 
-	err := s.TypeUsecase.UpdateType(r.Context(), id, types)
+	err = s.TypeUsecase.UpdateType(r.Context(), id, types)
 	if err != nil {
 		helper.FailedResponse(w, http.StatusBadRequest, err)
 		return
