@@ -1,28 +1,16 @@
-name: Go
+name: Test
 
 on: [push]
 
 jobs:
-
-  downnload-depenencies:
-    name: downnload-depenencies
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repo
       uses: actions/checkout@v2
-
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-
-  test:
-    name: test
-    needs: downnload-depenencies
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-
-      - name: test
-        run: make test
+    - name: Run Test
+      run: make test
